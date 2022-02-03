@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-export default ({ connectWallet }) => {
+export default function ConnectToWallet({ connectWallet }) {
   return (
     <Button
       onClick={connectWallet}
@@ -13,4 +13,4 @@ export default ({ connectWallet }) => {
       Connect to Phantom Wallet
     </Button>
   );
-};
+}

@@ -1,8 +1,8 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import ConnecToWallet from "./components/ConnecToWallet";
 import ConnectedContainer from "./components/ConnectedContainer";
-import { Container } from "@mui/material";
+import { Container, Typography, Box } from "@mui/material";
 import { Global } from "./context";
 import {
   getGifListService,
@@ -11,6 +11,7 @@ import {
   startVoteService,
   checkIfWalletIsConnected,
   connectWalletService,
+  donateService,
 } from "./services";
 
 const App = () => {
@@ -66,6 +67,10 @@ const App = () => {
     return startVoteService(item).then(() => getGifList());
   };
 
+  const donate = (item) => {
+    return donateService(item).then(() => getGifList());
+  };
+
   return (
     <Global.Provider
       value={{
@@ -75,12 +80,28 @@ const App = () => {
         sendGif,
         onInputChange,
         startVote,
+        donate,
       }}
     >
-      <Container>
+      <Container component="main">
+        {walletAddress && (
+          <>
+            <Box
+              sx={{
+                marginTop: 8,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Typography component="h1" variant="h5">
+                Decentralized Gif Exhibition
+              </Typography>
+            </Box>
+            <ConnectedContainer />
+          </>
+        )}
         {!walletAddress && <ConnecToWallet connectWallet={connectWallet} />}
-        {/* We just need to add the inverse here! */}
-        {walletAddress && <ConnectedContainer />}
       </Container>
     </Global.Provider>
   );

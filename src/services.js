@@ -1,7 +1,14 @@
-import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import {
+  Connection,
+  PublicKey,
+  clusterApiUrl,
+  Transaction,
+} from "@solana/web3.js";
 import { Program, Provider, web3 } from "@project-serum/anchor";
+
 import idl from "./idl.json";
 import kp from "./keypair.json";
+import { DONATE_AMOUNT } from "./constant";
 
 const network = clusterApiUrl("devnet");
 // Controls how we want to acknowledge when a transaction is "done".
@@ -16,9 +23,9 @@ const arr = Object.values(kp._keypair.secretKey);
 const secret = new Uint8Array(arr);
 const baseAccount = web3.Keypair.fromSecretKey(secret);
 const { SystemProgram } = web3;
+const connection = new Connection(network, opts.preflightCommitment);
 
 export const getProvider = () => {
-  const connection = new Connection(network, opts.preflightCommitment);
   const provider = new Provider(
     connection,
     window.solana,
@@ -122,4 +129,34 @@ export const connectWalletService = async () => {
     console.log("Connected with Public Key:", response.publicKey.toString());
     return response.publicKey.toString();
   }
+};
+
+export const donateService = async ({ userAddress, ...item }) => {
+  console.log("start donating...");
+  const fromPubkey = new PublicKey(provider.wallet.publicKey);
+  const toPubkey = new PublicKey(userAddress);
+
+  console.log(provider.wallet);
+
+  const instructions = SystemProgram.transfer({
+    fromPubkey,
+    toPubkey,
+    lamports: DONATE_AMOUNT * 1000000000, // 1 SOL = 1000000000 lamport
+  });
+  const recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+
+  const transferTransaction = new Transaction().add(instructions);
+  transferTransaction.feePayer = fromPubkey;
+  transferTransaction.recentBlockhash = recentBlockhash;
+
+  const signed = await provider.wallet.signTransaction(transferTransaction);
+  const signature = await connection.sendRawTransaction(signed.serialize());
+  const hash = await connection.confirmTransaction(signature);
+
+  // const hash = await sendAndConfirmTransaction(
+  //   connection,
+  //   transferTransaction,
+  //   [signature]
+  // );
+  console.log("hash", hash);
 };

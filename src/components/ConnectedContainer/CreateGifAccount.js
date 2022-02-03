@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Global } from "../../context";
 
-export default () => {
+export default function LoginToWallet() {
   const { createGifAccount } = useContext(Global);
   return (
     <div className="connected-container">
@@ -13,4 +13,4 @@ export default () => {
       </button>
     </div>
   );
-};
+}

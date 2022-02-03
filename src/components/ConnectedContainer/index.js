@@ -4,7 +4,7 @@ import ImageList from "./ImageList";
 import { useContext } from "react";
 import { Global } from "../../context";
 
-export default () => {
+const ConnectedContainer = () => {
   // If we hit this, it means the program account hasn't been initialized.
   const { gifList } = useContext(Global);
   if (gifList === null) {
@@ -20,3 +20,4 @@ export default () => {
     );
   }
 };
+export default ConnectedContainer;
